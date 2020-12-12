@@ -101,8 +101,6 @@ class Monitor:
             print("Error: can't email send:%s", (str(err)))
  
 
-# linux or mac run : monitor.sh
-# Windows run : monitor.bat
 if __name__ == '__main__':
     monitor = Monitor()
     ip = monitor.resolve_ip()
