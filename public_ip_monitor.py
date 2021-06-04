@@ -10,7 +10,7 @@ import requests
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
-
+import urllib3.connection
 
 # resolve ip from they servers, try one by one
 resolve_ip_servers = ['http://icanhazip.com/',
@@ -27,6 +27,25 @@ class Monitor:
         self.mail_port = 465
         self.sender = "xxx@163.com"
         self.receivers = ["xxx@163.com", "xxx@qq.com"]
+        self.bind_local_ip = None  #127.0.0.1
+
+
+        if self.bind_local_ip:
+
+            _urllib3_create_socket = urllib3.connection.connection.create_connection
+
+            def urllib3_create_connection(*args, **kwargs):
+                in_args = False
+                if len(args) >=3:
+                    args = list(args)
+                    args[2] = self.bind_local_ip
+                    in_args = True
+                    args = tuple(args)
+                if not in_args:
+                    kwargs["source_address"] = (self.bind_local_ip, 0)
+                return _urllib3_create_socket(*args, **kwargs)
+
+            urllib3.connection.connection.create_connection = urllib3_create_connection
 
     def resolve_ip(self):
         """
